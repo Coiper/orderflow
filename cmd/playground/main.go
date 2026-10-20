@@ -32,6 +32,10 @@ func (o Order) Total() int64 {
 	return total
 }
 
+func FormatPrice(cents int64) string {
+	return fmt.Sprintf("%d,%02d ₽", cents/100, cents%100)
+}
+
 func main() {
 	order := Order{
 		ID: "1",
@@ -42,5 +46,5 @@ func main() {
 			{Name: "Круассан", PriceCents: 18050, Quantity: 1},
 		},
 	}
-	fmt.Println(order.Total())
+	fmt.Println(FormatPrice(order.Total()))
 }
