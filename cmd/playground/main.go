@@ -1,26 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type Status string
 
 const (
 	StatusCreated Status = "created"
-	StatusPaid Status = "paid"
-	StatusFailed Status = "failed"
+	StatusPaid    Status = "paid"
+	StatusFailed  Status = "failed"
 )
 
 type Item struct {
-	Name	string
-	PriceCents	int64
-	Quantity	int
+	Name       string
+	PriceCents int64
+	Quantity   int
 }
 
 type Order struct {
-	ID	string
-	Customer	string
-	Items	[]Item
-	Status	Status
+	ID       string
+	Customer string
+	Items    []Item
+	Status   Status
 }
 
 func (o Order) Total() int64 {
@@ -36,15 +39,26 @@ func FormatPrice(cents int64) string {
 	return fmt.Sprintf("%d,%02d ₽", cents/100, cents%100)
 }
 
+func NewOrder(id string, customer string, items []Item) (Order, error) {
+	if customer == "" {
+		return Order{}, errors.New("имя не указано")
+	}
+	if len(items) == 0 {
+		return Order{}, errors.New("товаров нет")
+	}
+	order := Order{ID: id, Customer: customer, Items: items, Status: StatusCreated}
+	return order, nil
+}
+
 func main() {
-	order := Order{
-		ID: "1",
-		Customer: "Иван",
-		Status: StatusCreated,
-		Items: []Item{
-			{Name: "Кофе", PriceCents: 25000, Quantity: 2},
-			{Name: "Круассан", PriceCents: 18050, Quantity: 1},
-		},
+	items := []Item{
+		{Name: "Кофе", PriceCents: 25000, Quantity: 2},
+		{Name: "Круассан", PriceCents: 18050, Quantity: 1},
+	}
+	order, err := NewOrder("1", "Николай", items)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 	fmt.Println(FormatPrice(order.Total()))
 }
